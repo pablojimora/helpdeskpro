@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/app/services/commentService.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1765298677612,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1765298677612,
+            "name": "Commit-0",
+            "content": "import axios from 'axios';\n\nconst API_BASE_URL = '/api';\n\nexport interface IComment {\n  _id?: string;\n  ticketId: string;\n  author: {\n    _id: string;\n    name: string;\n    email: string;\n    role: 'client' | 'agent';\n  };\n  message: string;\n  createdAt?: string;\n  updatedAt?: string;\n}\n\nexport interface CreateCommentData {\n  ticketId: string;\n  message: string;\n}\n\nexport const commentService = {\n  // Obtener comentarios de un ticket\n  async getCommentsByTicket(ticketId: string): Promise<IComment[]> {\n    try {\n      const response = await axios.get(`${API_BASE_URL}/comments?ticketId=${ticketId}`);\n      return response.data.comments || [];\n    } catch (error) {\n      console.error('Error fetching comments:', error);\n      throw error;\n    }\n  },\n\n  // Crear un nuevo comentario\n  async createComment(data: CreateCommentData): Promise<IComment> {\n    try {\n      const response = await axios.post(`${API_BASE_URL}/comments`, data);\n      return response.data.comment;\n    } catch (error) {\n      console.error('Error creating comment:', error);\n      throw error;\n    }\n  },\n};\n"
+        }
+    ]
+}
