@@ -98,27 +98,40 @@ export async function GET(request: NextRequest) {
     const userRole = (session.user as any).role;
     const userId = (session.user as any).id;
 
-    let tickets;
+    // Obtener parámetros de filtro
+    const { searchParams } = new URL(request.url);
+    const statusFilter = searchParams.get('status');
+    const priorityFilter = searchParams.get('priority');
+
+    // Construir filtro base
+    let filter: any = {};
 
     // Si es cliente, solo ve sus propios tickets
     if (userRole === "client") {
-      tickets = await Ticket.find({ clientId: userId })
-        .populate("clientId", "name email")
-        .populate("agentId", "name email")
-        .sort({ createdAt: -1 });
+      filter.clientId = userId;
     } 
     // Si es agente, ve todos los tickets
     else if (userRole === "agent") {
-      tickets = await Ticket.find()
-        .populate("clientId", "name email")
-        .populate("agentId", "name email")
-        .sort({ createdAt: -1 });
+      // No se agrega filtro adicional, ve todos
     } else {
       return NextResponse.json(
         { error: "Rol no autorizado" },
         { status: 403 }
       );
     }
+
+    // Aplicar filtros adicionales
+    if (statusFilter) {
+      filter.status = statusFilter;
+    }
+    if (priorityFilter) {
+      filter.priority = priorityFilter;
+    }
+
+    const tickets = await Ticket.find(filter)
+      .populate("clientId", "name email")
+      .populate("agentId", "name email")
+      .sort({ createdAt: -1 });
 
     return NextResponse.json(
       { tickets },

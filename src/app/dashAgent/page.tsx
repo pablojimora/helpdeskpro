@@ -4,10 +4,11 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ticketService, ITicket } from '../services/ticketService';
 import { userService, IUser } from '../services/userService';
-import { notification } from '@/helpers/notificaciones';
+
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Button from '../components/Button';
+import { notification } from '@/helpers/notificaciones';
 
 export default function DashAgentPage() {
   const { data: session, status } = useSession();
@@ -39,9 +40,14 @@ export default function DashAgentPage() {
       return;
     }
 
-    loadTickets();
     loadAgents();
-  }, [session, status, router, statusFilter, priorityFilter]);
+  }, [session, status, router]);
+
+  useEffect(() => {
+    if (session?.user?.role === 'agent') {
+      loadTickets();
+    }
+  }, [statusFilter, priorityFilter, session]);
 
   const loadAgents = async () => {
     try {
@@ -190,11 +196,6 @@ export default function DashAgentPage() {
                 <option value="urgent">Urgente</option>
               </select>
             </div>
-          </div>
-          <div className="mt-4">
-            <Button onClick={loadTickets} variant="primary" size="md">
-              Aplicar Filtros
-            </Button>
           </div>
         </div>
 
